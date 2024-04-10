@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+<style>
+    body, html {
+      height: 100%;
+    }
+
+    .messages-box {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .messages-list {
+      padding-left: 0;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      list-style: none;
+    }
+
+    .message-text {
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .sent {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+    }
+
+    .received {
+      background-color: #f1f0f0;
+      align-self: flex-start;
+    }
+
+    .message-form {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      background-color: #f8f9fa;
+    }
+
+    .message-input {
+      flex: 1;
+      border-radius: 0;
+      border-right: none;
+    }
+
+    .btn-send {
+      border-radius: 0;
+    }
+
+    .delete-message {
+      flex: 1;
+    }
+
+    .update-message {
+      flex: 1;
+    }
+
+    .chat-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+<div class="chat-container">
+  <div class="card flex-grow-1">
+    <div class="card-header bg-primary text-white">Chat</div>
+    {% if user.is_authenticated %}
+    <div class="card-header bg-primary text-white"><a style="color: white" href="{% url 'logout' %}">Logout</a></div>
+    {% else %}
+    <div class="card-header bg-primary text-white"><a style="color: white" href="{% url 'login' %}">Login</a>  <a style="color: white" href="register">register</a></div>
+    {% endif %}
+    <div class="card-body messages-box">
+
+      <ul class="list-unstyled messages-list">
+
+        <li class="message received">
+          <div class="message-text">
+            <div class="message-sender">
+              <b>AI</b>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="message-content">
+              Привет {{user.username}}, я ваш чат-бот с искусственным интеллектом, вы можете спрашивать меня о чем угодно.
+            </div>
+            {% else %}
+            <div class="message-content">
+              Привет! Скорее зарегистрируйся чтобы спрашивать меня о чем угодно!
+            </div>
+            {% endif %}
+          </div>
+        </li>
+
+        {% for chat in chat_history %}
+          {% if chat.user == request.user %}
+
+            <li class="message sent">
+          <div class="message-text">
+            <div class="message-sender">
+              <b>Вы</b>
+            </div>
+            <div class="message-content">
+              {{chat.message}}
+              <a class="btn btn-sm btn-danger delete-message" href="{% url 'delete_message' chat.id %}">Удалить</a>
+              <a class="btn btn-sm btn-primary edit-message" href="{% url 'update_message' chat.id %}">Редактировать</a>
+            </div>
+          </div>
+        </li>
+
+        <li class="message received">
+          <div class="message-text">
+            <div class="message-sender">
+              <b>AI</b>
+            </div>
+            <div class="message-content">
+              {{chat.response}}
+            </div>
+          </div>
+        </li>
+
+          {% endif %}
+        {% endfor %}
+
+      </ul>
+
+    </div>
+    <br><br>
+    <br><br>
+    <br><br>
+  </div>
+  <form class="message-form" method="post">
+    {%csrf_token%}
+    <div class="input-group">
+      <input type="text" name="message" class="form-control message-input" placeholder="Type your message...">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-primary btn-send">Send</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

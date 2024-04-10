@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    #form {
+        text-align: center;
+    }
+
+    #message {
+        width: 500px;
+        height: 300px;
+        resize: none;
+    }
+
+    #submit {
+        border-radius: 0;
+        margin-top: 10px;
+    }
+
+    /* Центрирование кнопки */
+    .input-group-append {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<div class="container">
+    <form id="form" class="topBefore" method="post">
+        {%csrf_token%}
+        <textarea id="message" name="message" type="text">{{ chat }}</textarea>
+        <br>
+        <br>
+        <div class="input-group-append">
+            <button class="btn btn-sm btn-danger delete-message" href="{% url 'chatbot_url' %}">Отмена</button>
+            <button type="submit" class="btn btn-primary btn-send">Отправить</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
